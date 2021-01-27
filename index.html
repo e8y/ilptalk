@@ -1,0 +1,199 @@
+<!doctype html>
+<style>
+.container {
+    display: flex;
+}
+.col { 
+    flex: 1;
+}
+</style>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Tech Talk</title>
+
+        <link rel="stylesheet" href="revealjs/css/reset.css">
+        <link rel="stylesheet" href="revealjs/css/reveal.css">
+        <link rel="stylesheet" href="ilptalk/css/theme/ilptalk.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="highlightjs/src/styles/gruvbox-dark.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'revealjs/css/print/pdf.css' : 'revealjs/css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <!-- Start of presentation -->
+
+                <section class="center">
+                    <h2>Tech Talk</h2>
+                    <h4>Evan Wegley</h4>
+                </section>
+
+                <section id="fragments">
+                    <h2>Background: EDA</h2>
+                    <p>Electronic Design Automation</p>
+                    <div>
+                        <img class="plain fragment" height="150" src="assets/img/verilog.png">
+                        <img class="plain fragment" height="150" src="assets/img/netlist.png">
+                        <img class="plain fragment" height="150" src="assets/img/mapped.png">
+                    </div>
+                    <div>
+                        <img class="plain fragment" height="200" src="assets/img/placed.png">
+                        <img class="plain fragment" height="200" src="assets/img/routed.png">
+                    </div>
+                </section>
+
+                <section>
+                <section>
+                    <h2>Background: FPGA</h2>
+                    <p>Field Programmable Gate Array</p>
+                    <img class="plain" height="500" src="assets/img/fpga.png">
+                </section>
+                <section>
+                    <h2>Background: FPGA</h2>
+                    <p>Field Programmable Gate Array</p>
+                    <img class="plain" height="500" src="assets/img/clocktree.png">
+                </section>
+                </section>
+
+                <section id="fragments">
+                    <h2>Problem</h2>
+                    <p>Focus is on low power, small form factor FPGAs</p>
+                    <p class="fragment">Clock trees take up a lot of power and die size</p>
+                    <div class="fragment">
+                    <p>H/W designers want to make branches 50% populated</p>
+                    <img class="plain" height="80" src="assets/img/16to8.png">
+                    </div>
+                    <p class="fragment">Saves 10% on area!</p>
+                    <p class="fragment">Use local routing from neighboring rows to borrow a clock branch</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>Problem</h2>
+                    <p>No longer a trivial assignment problem for clock routing</p>
+                    <p class="fragment">Greedy assignment can lead to an illegal solution</p>
+                    <p class="fragment">Need to implement an assignment algorithm</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>First Approach</h2>
+                    <p>Considered dynamic programming to rollback assignments that lead to an illegal situation</p>
+                    <p class="fragment">Considered iterative cost-based algorithm to converge to a legal solution</p>
+                    <p class="fragment">Step back to model the problem more generically</p>
+                </section>
+
+                <section>
+                <section id="fragments">
+                    <h2>A Covering Problem</h2>
+                    <p>Define demand $D$, assignment $A$, and coverage $C$ matrices</p>
+                    <p>$M \times N$: $M$ rows, $N$ clock trees</p>
+                    <p class="fragment">$D_{i,j} = 1$ if clock tree $j$ is needed in row $i$, $0$ otherwise</p>
+                    <p class="fragment">$A_{i,j} = 1$ if clock tree $j$ is assigned a branch in row $i$, $0$ otherwise</p>
+                    <p class="fragment">$C_{i,j} = 1$ if clock tree $j$ is able to reach row $i$, $0$ otherwise</p>
+                    <p class="fragment">$A_{i,j} = 1 \implies C_{i-1,j} = C_{i,j} = C_{i+1,j} = 1$</p>
+                    <p class="fragment">$\min \sum\limits_{i,j} \left(D - A\right) : D_{i,j} = 1 \implies C_{i,j} = 1, \sum\limits_{j} A_i \leq \frac{N}{2}$</p>
+                </section>
+                <section id="fragments">
+                    <h2>Example</h2>
+                    <div class="container">
+                    <div class="col">
+                    <p>$D = \begin{bmatrix}
+                        1 & 0 & \color{orange}{1} & 1\\
+                        0 & 1 & 1 & 0\\
+                        1 & 1 & \color{orange}{1} & \color{orange}{1}\\
+                        0 & 0 & 0 & 1
+                    \end{bmatrix}$
+                    </p>
+                    </div>
+                    <div class="col">
+                    <p>$A = \begin{bmatrix}
+                        1 & 0 & \color{orange}{0} & 1\\
+                        0 & 1 & 1 & 0\\
+                        1 & 1 & \color{orange}{0} & \color{orange}{0}\\
+                        0 & 0 & 0 & 1
+                    \end{bmatrix}$
+                    </p>
+                    </div>
+                    <div class="col">
+                    <p>$C = \begin{bmatrix}
+                        1 & 1 & 1 & 1\\
+                        1 & 1 & 1 & 1\\
+                        1 & 1 & 1 & 1\\
+                        1 & 1 & 0 & 1
+                    \end{bmatrix}$
+                    </p>
+                    </div>
+                    </div>
+                    <p class="fragment">$D_{i,j} = 1 \implies C_{i,j} = 1$ ✔</p>
+                    <p class="fragment">$\sum A_i \leq \frac{N}{2}$ ✔</p>
+                    <p class="fragment">$\sum \left(D - A\right) = 3$</p>
+                </section>
+                </section>
+
+                <section id="fragments">
+                    <h2>Solution</h2>
+                    <p>Model as a (B)ILP problem</p>
+                    <div class="fragment">
+                    <p>Constraints</p>
+                    <p>$C_{i,j} \geq D_{i,j}$</p>
+                    </div>
+                    <div class="fragment">
+                    <p>$C_{i,j} \geq A_{i-1,j}, A_{i,j}, A_{i+1,j}$</p>
+                    <p>$C_{i,j} \leq A_{i-1,j} + A_{i,j} + A_{i+1,j}$</p>
+                    </div>
+                    <p class="fragment">$\sum A_{i,j} \leq N/2$</p>
+                    <p class="fragment">Objective: $\sum \left(D - A\right)$</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>Implementation</h2>
+                    <p>In C++, built the matrices from analyzing the circuit via internal data structures and API</p>
+                    <p class="fragment">Brought in LP solver library as a dependency, wrote interface</p>
+                    <p class="fragment">Stress tested with script-generated Verilog circuits</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>Results</h2>
+                    <p>Productized (late 2019)</p>
+                    <p class="fragment">Fast, exact optimal solution, enabling substantial H/W power and area savings without requiring any user intervention</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>Post-mortem</h2>
+                    <p>Chainsaw to cut paper?</p>
+                    <p class="fragment">How does it scale?</p>
+                </section>
+
+                <section id="fragments">
+                    <h2>Hindsight</h2>
+                    <p>First Principles</p>
+                    <p><em>Assumptions:</em> issues with greedy approach</p>
+                    <p class="fragment"><em>Break into fundamentals:</em> mathematical model</p>
+                    <p class="fragment"><em>Implement from scratch:</em> new LP-based solution</p>
+                </section>
+
+                <section class="center">
+                    <h2>Thanks!</h2>
+                    <h4>Q&amp;A</h4>
+                </section>
+
+                <!-- End of presentation -->
+            </div>
+        </div>
+
+        <script src="revealjs/js/reveal.js"></script>
+        <script src="ilptalk/js/ilptalk.js"></script>
+    </body>
+</html>
+

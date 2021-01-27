@@ -1,0 +1,53 @@
+// Default mixins and settings -----------------
+@import "../../../../revealjs/css/theme/template/mixins";
+@import "../../../../revealjs/css/theme/template/settings";
+// ---------------------------------------------
+
+
+
+// Include theme-specific fonts
+
+// Copied from https://fonts.googleapis.com/css?family=Source+Serif+Pro:700&display=swap
+/* latin */
+@font-face {
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: local('Source Serif Pro Bold'), local('SourceSerifPro-Bold'), url(https://fonts.gstatic.com/s/sourceserifpro/v7/neIXzD-0qpwxpaWvjeD0X88SAOeasc8btSyqxA.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+// Copied from https://fonts.googleapis.com/css?family=Source+Sans+Pro:400&display=swap
+/* latin */
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v13/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// Override theme settings (see ../../../../revealjs/css/theme/template/settings.scss)
+$mainFont: 'Source Sans Pro', sans-serif;
+$mainColor: #fff;
+$headingFont: 'Source Serif Pro', serif;
+$headingColor: #fff;
+$headingFontWeight: 700;
+$headingTextShadow: none;
+$headingTextTransform: none;
+$backgroundColor: #3f51b5; // Material Indigo 500
+// Material Deep Orange 500: #ff5722
+$linkColor: #fff;
+$linkColorHover: darken($linkColor, 40%);
+$selectionBackgroundColor: lighten($linkColor, 25%);
+
+section.has-light-background {
+	&, h1, h2, h3, h4, h5, h6 {
+		color: #222;
+	}
+}
+
+// Theme template ------------------------------
+@import "../../../../revealjs/css/theme/template/theme";
+// ---------------------------------------------
